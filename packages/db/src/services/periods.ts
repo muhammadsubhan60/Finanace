@@ -76,12 +76,14 @@ async function ledgerCash(orgId: string, upToDate: string) {
 
 async function partnerOpening(orgId: string, periodId: string, profile: AgreementProfile): Promise<PeriodInput["partners"]> {
   const db = await getDb();
-  const snaps = await latestSnapshotsBefore(orgId, periodId);
-  const wd = await db.collection("withdrawals").aggregate<{ _id: { partnerId: string; periodId: string }; total: number }>([
+  const [snaps, wd, netting] = await Promise.all([
+    latestSnapshotsBefore(orgId, periodId),
+    db.collection("withdrawals").aggregate<{ _id: { partnerId: string; periodId: string }; total: number }>([
     { $match: { orgId, status: "paid", periodId: { $lte: periodId } } },
     { $group: { _id: { partnerId: "$partnerId", periodId: "$periodId" }, total: { $sum: "$amountMinor" } } },
-  ]).toArray();
-  const netting = await db.collection("netting_receivables").aggregate<{ _id: string; total: number }>([{ $match: { orgId } }, { $group: { _id: "$partnerId", total: { $sum: "$amountMinor" } } }]).toArray();
+  ]).toArray(),
+    db.collection("netting_receivables").aggregate<{ _id: string; total: number }>([{ $match: { orgId } }, { $group: { _id: "$partnerId", total: { $sum: "$amountMinor" } } }]).toArray(),
+  ]);
   const out: PeriodInput["partners"] = {};
   for (const p of profile.partners) {
     let opening = 0;
@@ -114,20 +116,24 @@ async function latestSnapshotsBefore(orgId: string, periodId: string): Promise<S
 export async function buildPeriodInput(orgId: string, periodId: string, profile: AgreementProfile, opts: { cashAsOf?: string } = {}): Promise<PeriodInput> {
   const db = await getDb();
   const { start, end } = periodBounds(periodId);
-  const pdoc = await db.collection<PeriodDoc>("periods").findOne({ orgId, periodId });
   // Period results exclude close postings and corrections made later for earlier periods.
   // Corrections for earlier periods are attributed to that period's correction statement, not to this one.
-  const b = await balances(orgId, { periodId, source: { $nin: ["period_close", "correction"] } });
+  // All reads are independent: run them together so the page waits one round trip, not five.
+  const [pdoc, b, prevSnaps, cash, partners] = await Promise.all([
+    db.collection<PeriodDoc>("periods").findOne({ orgId, periodId }),
+    balances(orgId, { periodId, source: { $nin: ["period_close", "correction"] } }),
+    latestSnapshotsBefore(orgId, periodId),
+    ledgerCash(orgId, opts.cashAsOf ?? end),
+    partnerOpening(orgId, periodId, profile),
+  ]);
   const expensesByCategory: Record<string, number> = {};
   for (const c of profile.expenseCategories) {
     if (c.key === "cogs" || c.key === "reinvestment") continue;
     const v = dr(b, expenseAccount(c.key));
     if (v) expensesByCategory[c.key] = v;
   }
-  const prevSnaps = await latestSnapshotsBefore(orgId, periodId);
   const prev = prevSnaps.sort((a, b2) => b2.periodId.localeCompare(a.periodId))[0];
   const termEnd = addMonths(profile.term.start.slice(0, 7), profile.term.months);
-  const cash = await ledgerCash(orgId, opts.cashAsOf ?? end);
   const r = pdoc?.reserveInputs;
   return {
     periodId,
@@ -158,7 +164,7 @@ export async function buildPeriodInput(orgId: string, periodId: string, profile:
         extraReserveCalcRef: r?.extraReserveCalcRef,
       },
     },
-    partners: await partnerOpening(orgId, periodId, profile),
+    partners,
   };
 }
 

@@ -99,12 +99,20 @@ export interface SessionUser {
 export async function resolveSession(token: string | undefined): Promise<SessionUser | null> {
   if (!token) return null;
   const db = await getDb();
-  const s = await db.collection("sessions").findOne({ _id: tokenHash(token) as never });
-  if (!s || s.expiresAt < new Date()) return null;
-  const u = await db.collection("users").findOne({ _id: s.userId as never, orgId: ORG_ID, status: "active" });
+  // One round trip: session → active user → role (this runs on every page request).
+  const [row] = await db.collection("sessions").aggregate<{ expiresAt: Date; u?: Record<string, any>; role?: Record<string, any> }>([
+    { $match: { _id: tokenHash(token) } },
+    { $limit: 1 },
+    { $lookup: { from: "users", let: { uid: "$userId" }, pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$uid"] }, orgId: ORG_ID, status: "active" } }, { $limit: 1 }], as: "u" } },
+    { $unwind: { path: "$u", preserveNullAndEmptyArrays: true } },
+    { $lookup: { from: "roles", let: { rk: "$u.role" }, pipeline: [{ $match: { $expr: { $eq: ["$key", "$$rk"] }, orgId: ORG_ID } }, { $limit: 1 }], as: "role" } },
+    { $unwind: { path: "$role", preserveNullAndEmptyArrays: true } },
+  ]).toArray();
+  if (!row || row.expiresAt < new Date()) return null;
+  const u = row.u;
   if (!u) return null;
   if (u.accessExpiresAt && u.accessExpiresAt < new Date()) return null; // time-limited accountant access
-  const role = await db.collection("roles").findOne({ orgId: ORG_ID, key: u.role });
+  const role = row.role;
   return {
     _id: String(u._id),
     name: u.name,

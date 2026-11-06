@@ -1,0 +1,24 @@
+{
+  "name": "@delta/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@vitest/coverage-v8": "4.1.12",
+    "fast-check": "^4.10.2",
+    "typescript": "5.9.3",
+    "vitest": "^4"
+  },
+  "dependencies": {
+    "@delta/config-schema": "workspace:*"
+  }
+}

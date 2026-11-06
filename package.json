@@ -1,0 +1,13 @@
+{
+  "name": "delta-finance",
+  "private": true,
+  "packageManager": "pnpm@10.34.7",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "worker": "pnpm --filter worker start",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "db:start": "bash scripts/mongo-dev.sh",
+    "seed": "pnpm --filter @delta/db seed"
+  }
+}

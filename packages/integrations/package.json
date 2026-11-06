@@ -1,0 +1,10 @@
+{
+  "name": "@delta/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "vitest run", "typecheck": "tsc -p ." },
+  "dependencies": { "@delta/core": "workspace:*", "@delta/config-schema": "workspace:*" },
+  "devDependencies": { "vitest": "^4", "typescript": "5.9.3", "@types/node": "^24" }
+}

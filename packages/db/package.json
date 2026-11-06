@@ -1,0 +1,22 @@
+{
+  "name": "@delta/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "seed": "tsx --env-file=../../.env scripts/seed.ts",
+    "verify-chain": "tsx --env-file=../../.env scripts/verify-chain.ts",
+    "e2e": "tsx --env-file=../../.env scripts/e2e-month.ts",
+    "load-test": "tsx --env-file=../../.env scripts/load-test.ts",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@delta/core": "workspace:*",
+    "@delta/config-schema": "workspace:*",
+    "@delta/integrations": "workspace:*",
+    "mongodb": "^7.8.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": { "tsx": "^4.23.15", "typescript": "5.9.3", "@types/node": "^24" }
+}

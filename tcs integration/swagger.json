@@ -1,0 +1,1126 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "x-ibm-name": "cod-api",
+    "title": "Cash on Delivery API",
+    "version": "1.0.0",
+    "description": "This API is used to automate the Cash on Delivery (COD) orders, now you can easily integrate COD API with your systems, E-Com websites from which order will be placed.\n\n<label>Prerequisites</label>\n\n1. Request parameter key names must be correct (case sensitive).\n2. Input parameter key values are not case sensitive.\n3. Subscription must be made to API product before integration.\n\n<label>Message Status</label>  \n\nReply message status can be determined from below object.\n\n<pre><code>{ \n\"returnStatus\":    { \n     \"code\": \"0200\", \n     \"status\": \"SUCCESS\", \n     \"message\": \"The operation was successful.\", \n     \"requestTime\": \"20180724111142089\", \n     \"responseTime\": \"20180724111143100\"\n  }  \n} </code></pre>\n\n| Code | Description |\n| ------ | ------ |\n| 0200 | The operation was successful. |\n| 0400 | Bad Request / Custom validation message. |\n| 0404 | Data Not Found. |\n| 0408 | The server is taking too long to respond, please try later. |\n| 0500 | An internal error has occurred. |\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->",
+    "contact": {
+      "name": "",
+      "url": ""
+    },
+    "termsOfService": "",
+    "license": {
+      "name": "",
+      "url": ""
+    }
+  },
+  "security": [
+    {
+      "clientIdHeader": []
+    }
+  ],
+  "paths": {
+    "/countries": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The collection of resources was retrieved.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/allCountries"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "description": "<br>This API is used to get TCS shipment country codes list with description.",
+        "summary": "To get all TCS country list",
+        "tags": [
+          "Country List"
+        ]
+      }
+    },
+    "/origins": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The collection of resources was retrieved.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/allOrigins"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "description": "<br>This API is used to get TCS shipment origin/station codes list with description.",
+        "summary": "To get all TCS station list",
+        "tags": [
+          "Station List"
+        ]
+      }
+    },
+    "/cities": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/allCities"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "tags": [
+          "City List"
+        ],
+        "summary": "To get all TCS city list",
+        "description": "<br>This API is used to get TCS shipment city codes list with description."
+      }
+    },
+    "/create-order": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "The operation was successfull.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/bookingReply"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "<br>To order a C.O.D shipment and get reference number.",
+        "summary": "To place an order",
+        "tags": [
+          "Order"
+        ]
+      }
+    },
+    "/create-order/cn": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "The operation was successfull.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/bookingReply"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createCNOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "<br>To order a C.O.D shipment by CN and get reference number. Use this operation if TCS has shared list of consignment numbers with you in advance, otherwise use /create-order operation.",
+        "summary": "To place an order by CN",
+        "tags": [
+          "Order"
+        ]
+      }
+    },
+    "/cancel-order": {
+      "put": {
+        "responses": {
+          "200": {
+            "description": "The collection of resources was retrieved.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/returnStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/cancelOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "<br>To cancel C.O.D shipments by your reference number.",
+        "summary": "To cancel an order",
+        "tags": [
+          "Order"
+        ]
+      }
+    },
+    "/track-order": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The operation was successful.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/cnDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "userName",
+            "required": true,
+            "in": "query",
+            "description": "Testapp",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "required": true,
+            "in": "query",
+            "description": "test123",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "referenceNo",
+            "required": true,
+            "in": "query",
+            "description": "1234",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "<br>To track C.O.D shipments by your reference number.",
+        "summary": "To track an C.O.D order",
+        "tags": [
+          "Order"
+        ]
+      }
+    },
+    "/createCostCenterCode": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "The operation was successful.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/costCenterCodeReply"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createCostCenterCode"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Cost Center"
+        ],
+        "summary": "To create cost center code",
+        "description": "<br>This API allows to create a new cost center code"
+      }
+    },
+    "/pickup-status": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/returnStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "consignmentNumber",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Pickup"
+        ],
+        "summary": "To track pickup status",
+        "description": "<br>To track C.O.D shipment pickup status."
+      }
+    },
+    "/payment-details": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/returnStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "consignmentNumber",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Payment"
+        ],
+        "summary": "To get payment details",
+        "description": "<br>To get payment details by consignment number."
+      }
+    },
+    "/payment-invoice": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/returnStatus"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "invoiceNumber",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Payment"
+        ],
+        "summary": "To get payment invoice detail",
+        "description": "<br>To get payment invoice details by invoice number."
+      }
+    },
+    "/reverse-logistics": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/bookingReply"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "description": "Not Acceptable"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "summary": "To reverse an order",
+        "description": "<br>To reverse a C.O.D shipment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/reverseOrder"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  },
+  "mtime": "2023-04-10T08:20:50.000Z",
+  "servers": [
+    {
+      "url": "https://api.tcscourier.com/production/v1/cod"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "clientIdHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-IBM-Client-Id",
+        "description": "This is your registered application Client ID check the Apps credentials for the detail, as you started API integration provide this apiKey in header."
+      }
+    },
+    "schemas": {
+      "cnDetails": {
+        "type": "object",
+        "properties": {
+          "cnDetail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/cnDetail"
+            }
+          }
+        }
+      },
+      "allOrigins": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/origin"
+            }
+          }
+        }
+      },
+      "allCities": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/city"
+            }
+          }
+        }
+      },
+      "allCountries": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/country"
+            }
+          }
+        }
+      },
+      "country": {
+        "type": "object",
+        "properties": {
+          "countryId": {
+            "type": "string"
+          },
+          "countryName": {
+            "type": "string"
+          }
+        }
+      },
+      "origin": {
+        "type": "object",
+        "properties": {
+          "areaID": {
+            "type": "string"
+          },
+          "areaName": {
+            "type": "string"
+          },
+          "areaCode": {
+            "type": "string"
+          },
+          "servedVia": {
+            "type": "string"
+          }
+        }
+      },
+      "city": {
+        "type": "object",
+        "properties": {
+          "cityID": {
+            "type": "string"
+          },
+          "cityName": {
+            "type": "string"
+          },
+          "cityCode": {
+            "type": "string"
+          },
+          "area": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cityID",
+          "cityName",
+          "cityCode",
+          "area"
+        ]
+      },
+      "returnStatus": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestTime": {
+            "type": "string"
+          },
+          "responseTime": {
+            "type": "string"
+          }
+        }
+      },
+      "cnDetail": {
+        "type": "object",
+        "properties": {
+          "consignmentNumber": {
+            "type": "string"
+          },
+          "customerRefernceNumber": {
+            "type": "string"
+          },
+          "consignee": {
+            "type": "string"
+          },
+          "consigneeAddress": {
+            "type": "string"
+          },
+          "consigneeContact": {
+            "type": "string"
+          },
+          "consigneeEmail": {
+            "type": "string"
+          },
+          "ShipmentPieces": {
+            "type": "string"
+          },
+          "ShipmentWeight": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          },
+          "remarks": {
+            "type": "string"
+          },
+          "fragile": {
+            "type": "string"
+          },
+          "insuranceValue": {
+            "type": "string"
+          },
+          "destinationCountry": {
+            "type": "string"
+          },
+          "productDetail": {
+            "type": "string"
+          },
+          "codAmount": {
+            "type": "string"
+          }
+        }
+      },
+      "createOrder": {
+        "properties": {
+          "userName": {
+            "type": "string",
+            "example": "Testapp"
+          },
+          "password": {
+            "type": "string",
+            "example": "test123"
+          },
+          "costCenterCode": {
+            "type": "string",
+            "example": "1123"
+          },
+          "consigneeName": {
+            "type": "string"
+          },
+          "consigneeAddress": {
+            "type": "string"
+          },
+          "consigneeMobNo": {
+            "type": "string"
+          },
+          "consigneeEmail": {
+            "type": "string"
+          },
+          "originCityName": {
+            "type": "string",
+            "example": "Karachi"
+          },
+          "destinationCityName": {
+            "type": "string",
+            "example": "Lahore"
+          },
+          "weight": {
+            "type": "number",
+            "example": 1
+          },
+          "pieces": {
+            "type": "number",
+            "example": 1
+          },
+          "codAmount": {
+            "type": "string",
+            "example": "1"
+          },
+          "customerReferenceNo": {
+            "type": "string",
+            "example": "123"
+          },
+          "services": {
+            "type": "string",
+            "example": "O"
+          },
+          "productDetails": {
+            "type": "string"
+          },
+          "fragile": {
+            "type": "string",
+            "example": "Yes"
+          },
+          "remarks": {
+            "type": "string"
+          },
+          "insuranceValue": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "userName",
+          "password",
+          "costCenterCode",
+          "consigneeName",
+          "consigneeAddress",
+          "consigneeMobNo",
+          "consigneeEmail",
+          "originCityName",
+          "destinationCityName",
+          "weight",
+          "pieces",
+          "codAmount",
+          "services",
+          "fragile"
+        ],
+        "additionalProperties": false
+      },
+      "createCNOrder": {
+        "properties": {
+          "consignmentNo": {
+            "type": "string",
+            "example": 99920175030
+          },
+          "userName": {
+            "type": "string",
+            "example": "uat"
+          },
+          "password": {
+            "type": "string",
+            "example": "abc+"
+          },
+          "costCenterCode": {
+            "type": "string",
+            "example": "CCC01"
+          },
+          "consigneeName": {
+            "type": "string"
+          },
+          "consigneeAddress": {
+            "type": "string"
+          },
+          "consigneeLandLine": {
+            "type": "string"
+          },
+          "consigneeMobNo": {
+            "type": "string"
+          },
+          "consigneeEmail": {
+            "type": "string"
+          },
+          "originCityName": {
+            "type": "string",
+            "example": "Karachi"
+          },
+          "destinationCityName": {
+            "type": "string",
+            "example": "Lahore"
+          },
+          "weight": {
+            "type": "number",
+            "example": 1
+          },
+          "pieces": {
+            "type": "number",
+            "example": 1
+          },
+          "codAmount": {
+            "type": "number",
+            "example": "1",
+            "format": "float"
+          },
+          "customerReferenceNo": {
+            "type": "string",
+            "example": "123"
+          },
+          "TCSAccountNo": {
+            "type": "string",
+            "example": "880826"
+          },
+          "services": {
+            "type": "string",
+            "example": "O"
+          },
+          "productDetails": {
+            "type": "string"
+          },
+          "fragile": {
+            "type": "string",
+            "example": "Yes"
+          },
+          "remarks": {
+            "type": "string"
+          },
+          "insuranceValue": {
+            "type": "number",
+            "example": 1,
+            "format": "float"
+          },
+          "transactionType": {
+            "type": "integer",
+            "example": "1",
+            "format": "int32",
+            "description": "1 = booking, 3 = Customer return shipment pickup from home, 4 = Customer return shipment express center drop off"
+          },
+          "vendorName": {
+            "type": "string",
+            "example": 1
+          },
+          "vendorAddressName": {
+            "type": "string",
+            "example": "Daraz Bulky Warehouse Plot No. S-1, Survey No. 231, Sector No. 02, Road No. 4000, Korangi Industrial Area Karachi"
+          },
+          "vendorAddressDistrict": {
+            "type": "string",
+            "example": "Karachi - Korangi"
+          },
+          "vendorAddressCity": {
+            "type": "string",
+            "example": "Sindh"
+          },
+          "vendorAddressArea": {
+            "type": "string",
+            "example": "Korangi Industrial Area"
+          },
+          "vendorContactNo": {
+            "type": "string",
+            "example": "923018****32"
+          },
+          "bookingInfo": {
+            "type": "string",
+            "example": ""
+          },
+          "shippingType": {
+            "type": "string",
+            "example": "Warehouse"
+          },
+          "dsFlag": {
+            "type": "string",
+            "example": "CB"
+          },
+          "carrierSlug": {
+            "type": "string",
+            "example": "pk-khi-tcs_ole"
+          }
+        },
+        "required": [
+          "userName",
+          "password",
+          "costCenterCode",
+          "consigneeName",
+          "consigneeAddress",
+          "consigneeMobNo",
+          "consigneeEmail",
+          "originCityName",
+          "destinationCityName",
+          "weight",
+          "pieces",
+          "codAmount",
+          "services",
+          "fragile",
+          "consignmentNo",
+          "TCSAccountNo",
+          "transactionType"
+        ],
+        "additionalProperties": false
+      },
+      "cancelOrder": {
+        "properties": {
+          "userName": {
+            "type": "string",
+            "example": "Testapp"
+          },
+          "password": {
+            "type": "string",
+            "example": "test123"
+          },
+          "consignmentNumber": {
+            "type": "string",
+            "example": "000"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "userName",
+          "password",
+          "consignmentNumber"
+        ]
+      },
+      "createCostCenterCode": {
+        "properties": {
+          "userName": {
+            "type": "string",
+            "example": "testenvio"
+          },
+          "password": {
+            "type": "string",
+            "example": "abc123+"
+          },
+          "costCenterCityName": {
+            "type": "string",
+            "example": "KARACHI"
+          },
+          "costCenterCode": {
+            "type": "string",
+            "example": "Test1"
+          },
+          "costCenterName": {
+            "type": "string",
+            "example": "Kathryn Poole1"
+          },
+          "pickupAddress": {
+            "type": "string",
+            "example": "1433 Tranzum Plaza"
+          },
+          "returnAddress": {
+            "type": "string",
+            "example": "West Wharf Ware House"
+          },
+          "isLabelPrint": {
+            "type": "string",
+            "example": "No"
+          },
+          "accountNo": {
+            "type": "string",
+            "example": "04011K1"
+          },
+          "contactNumber": {
+            "type": "string",
+            "example": "02111123456"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "userName",
+          "password",
+          "costCenterCityName",
+          "costCenterCode",
+          "costCenterName",
+          "pickupAddress",
+          "returnAddress",
+          "isLabelPrint",
+          "accountNo"
+        ]
+      },
+      "bookingReply": {
+        "type": "object",
+        "properties": {
+          "CN": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "CN"
+        ]
+      },
+      "costCenterCodeReply": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "example": "Your Cost Center Code is: 99210149829"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "reverseOrder": {
+        "properties": {
+          "userName": {
+            "type": "string",
+            "example": "Testapp"
+          },
+          "password": {
+            "type": "string",
+            "example": "test123"
+          },
+          "costCenterCode": {
+            "type": "string",
+            "example": "1122"
+          },
+          "consignmentNo": {
+            "type": "string",
+            "example": "12345"
+          },
+          "consigneeMobNo": {
+            "type": "string",
+            "example": "0313"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -20,3 +20,4 @@ Quick start: see [docs/RUNBOOK.md](docs/RUNBOOK.md#local-development).
 - The ledger is append-only and hash-chained. Corrections are reversal + new entries.
 - Every external call goes through an adapter. Mocks ship, so the app works with no credentials.
 # Finanace
+# Finanace

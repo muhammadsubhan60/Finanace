@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "tsx --env-file=../../.env src/index.ts",
-    "once": "tsx --env-file=../../.env src/index.ts --once",
+    "start": "tsx --env-file-if-exists=../../.env src/index.ts",
+    "once": "tsx --env-file-if-exists=../../.env src/index.ts --once",
     "typecheck": "tsc -p ."
   },
   "dependencies": { "@delta/core": "workspace:*", "@delta/db": "workspace:*" },

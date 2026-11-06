@@ -1,0 +1,11 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "echo worker runs from source with tsx",
+    "watchPatterns": ["apps/worker/**", "packages/**", "pnpm-lock.yaml"]
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter worker start",
+    "restartPolicyType": "ALWAYS"
+  }
+}

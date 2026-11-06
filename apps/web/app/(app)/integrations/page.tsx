@@ -4,6 +4,7 @@ import { Badge, Card, CardBody, CardHeader, Field, Input, Notice, PageHeader, Se
 import { ActionForm, Submit } from "@/components/action-form";
 import { has, requireUser } from "@/lib/session";
 import { dt } from "@/lib/utils";
+import { appUrl } from "@/lib/app-url";
 import { resync, saveCreds, test, toggle } from "./actions";
 
 export const metadata = { title: "Integrations" };
@@ -45,8 +46,8 @@ export default async function Integrations() {
                   <div><dt className="text-xs text-muted-foreground">Errors</dt><dd className={i.errorCount ? "text-negative" : ""}>{i.errorCount}</dd></div>
                 </dl>
                 {i.lastError ? <Notice tone="negative">{i.lastError}</Notice> : null}
-                {i.type === "courier" ? <p className="text-xs text-muted-foreground">Webhook (push) URL: <span className="select-all font-mono">/api/webhooks/courier/{i._id}</span></p> : null}
-                {i.type === "shopify" ? <p className="text-xs text-muted-foreground">Webhook URL: <span className="select-all font-mono">/api/webhooks/shopify/{i._id}</span></p> : null}
+                {i.type === "courier" ? <p className="text-xs text-muted-foreground">Webhook (push) URL: <span className="select-all break-all font-mono">{appUrl(`/api/webhooks/courier/${i._id}`)}</span></p> : null}
+                {i.type === "shopify" ? <p className="text-xs text-muted-foreground">Webhook URL: <span className="select-all break-all font-mono">{appUrl(`/api/webhooks/shopify/${i._id}`)}</span></p> : null}
                 {manage ? (
                   <>
                     <div className="flex flex-wrap gap-2">

@@ -5,7 +5,11 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { can, ctxFromUser, resolveSession, type Ctx, type SessionUser } from "@delta/db";
 
-export const SESSION_COOKIE = "df_session";
+/**
+ * `__Host-` in production: browser only accepts it from this exact host over HTTPS, with no Domain attribute,
+ * so the parent site (deltalabs.tech) or a sibling subdomain can't set or overwrite the session cookie.
+ */
+export const SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-df_session" : "df_session";
 
 export const getUser = cache(async (): Promise<SessionUser | null> => {
   const jar = await cookies();

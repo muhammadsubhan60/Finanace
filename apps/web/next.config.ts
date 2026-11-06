@@ -11,10 +11,13 @@ const csp = [
   "form-action 'self'",
 ].join("; ");
 
+// Public host (e.g. ops.ecom.deltalabs.tech). Server actions reject mutations whose Origin isn't this host.
+const appHost = process.env.APP_URL ? new URL(process.env.APP_URL).host : undefined;
+
 const config: NextConfig = {
   transpilePackages: ["@delta/core", "@delta/db", "@delta/config-schema", "@delta/integrations"],
   serverExternalPackages: ["mongodb"],
-  experimental: { serverActions: { bodySizeLimit: "10mb" } },
+  experimental: { serverActions: { bodySizeLimit: "10mb", ...(appHost ? { allowedOrigins: [appHost] } : {}) } },
   async headers() {
     return [{ source: "/(.*)", headers: [
       { key: "Content-Security-Policy", value: csp },
@@ -22,6 +25,7 @@ const config: NextConfig = {
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "Referrer-Policy", value: "same-origin" },
       { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+      { key: "X-Robots-Tag", value: "noindex, nofollow" },
       ...(process.env.NODE_ENV === "production" ? [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }] : []),
     ] }];
   },

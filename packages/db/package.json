@@ -5,10 +5,10 @@
   "type": "module",
   "exports": { ".": "./src/index.ts" },
   "scripts": {
-    "seed": "tsx --env-file=../../.env scripts/seed.ts",
-    "verify-chain": "tsx --env-file=../../.env scripts/verify-chain.ts",
-    "e2e": "tsx --env-file=../../.env scripts/e2e-month.ts",
-    "load-test": "tsx --env-file=../../.env scripts/load-test.ts",
+    "seed": "tsx --env-file-if-exists=../../.env scripts/seed.ts",
+    "verify-chain": "tsx --env-file-if-exists=../../.env scripts/verify-chain.ts",
+    "e2e": "tsx --env-file-if-exists=../../.env scripts/e2e-month.ts",
+    "load-test": "tsx --env-file-if-exists=../../.env scripts/load-test.ts",
     "typecheck": "tsc -p ."
   },
   "dependencies": {

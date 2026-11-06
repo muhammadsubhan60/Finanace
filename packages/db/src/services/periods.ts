@@ -198,7 +198,7 @@ export async function closeChecklist(orgId: string, periodId: string): Promise<C
   const unmatchedLines = await db.collection("cod_settlement_lines").countDocuments({ orgId, flag: { $ne: "ok" }, resolved: { $ne: true } });
   add("no_unmatched_settlement_lines", "No unmatched settlement lines", unmatchedLines === 0, `${unmatchedLines} open`, "/cod");
 
-  const unalloc = await db.collection("ad_spend_daily").countDocuments({ orgId, date: { $gte: start, $lte: end }, allocation: "unallocated" });
+  const unalloc = await db.collection("ad_spend_daily").countDocuments({ orgId, date: { $gte: start, $lte: end }, allocation: "unallocated", deletedAt: { $exists: false } });
   add("no_unallocated_ad_spend", "No unallocated ad spend", unalloc === 0, `${unalloc} rows`, "/ads");
 
   const pending = await db.collection("expenses").countDocuments({ orgId, date: { $gte: start, $lte: end }, status: { $in: ["draft", "pending"] } });

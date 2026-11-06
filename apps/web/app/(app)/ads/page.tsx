@@ -5,7 +5,7 @@ import { ActionForm, Submit } from "@/components/action-form";
 import { FilterBar, FInput, FSelect } from "@/components/filters";
 import { has, requireUser } from "@/lib/session";
 import { pkr } from "@/lib/utils";
-import { assign, payCard } from "./actions";
+import { assign, deleteSpend, editSpend, payCard } from "./actions";
 
 export const metadata = { title: "Ads" };
 
@@ -17,7 +17,7 @@ export default async function Ads({ searchParams }: { searchParams: Promise<Reco
   const to = sp.to ?? today;
   const db = await getDb();
   const [accounts, stores] = await Promise.all([db.collection("ad_accounts").find({ orgId: ORG_ID }).toArray(), db.collection("stores").find({ orgId: ORG_ID }).toArray()]);
-  const match: Record<string, unknown> = { orgId: ORG_ID, date: { $gte: from, $lte: to } };
+  const match: Record<string, unknown> = { orgId: ORG_ID, date: { $gte: from, $lte: to }, deletedAt: { $exists: false } };
   if (sp.account) match.adAccountId = sp.account;
   const byCampaign = await db.collection("ad_spend_daily").aggregate<{ _id: { a: string; c: string }; name: string; spend: number; rev: number; purchases: number; allocation: string; storeId: string | null }>([
     { $match: match },
@@ -25,7 +25,11 @@ export default async function Ads({ searchParams }: { searchParams: Promise<Reco
     { $sort: { spend: -1 } },
   ]).toArray();
   const unallocated = byCampaign.filter((c) => c.allocation === "unallocated");
-  const b = await balances(ORG_ID, {});
+  const canEdit = has(u, "journal:adjust");
+  const [b, dailyRows] = await Promise.all([
+    balances(ORG_ID, {}),
+    canEdit ? db.collection("ad_spend_daily").find(match).sort({ date: -1, spendMinor: -1 }).limit(300).toArray() : Promise.resolve([]),
+  ]);
   const cardPayable = crBal(b, "card_payable");
   const storeName = new Map(stores.map((s) => [String(s._id), s.name]));
   const canManage = has(u, "integrations:manage");
@@ -100,6 +104,46 @@ export default async function Ads({ searchParams }: { searchParams: Promise<Reco
           </CardBody>
         </Card>
       </div>
+
+      {canEdit ? (
+        <Card className="mt-4">
+          <CardHeader title="Daily spend rows" description="Edit or delete a day's spend. The ledger is never edited in place: the old posting is reversed and the new amount posted (in the current month if that month is closed). Edited rows are kept as you set them; Meta sync won't overwrite them. Every change is in the audit log." />
+          <Table>
+            <thead><tr><Th>Date</Th><Th>Campaign</Th><Th>Store</Th><Th align="right">Spend</Th><Th>Edit</Th><Th>Delete</Th></tr></thead>
+            <tbody>
+              {dailyRows.map((r) => {
+                const id = String(r._id);
+                const meta = r.manualOverride?.meta?.spendMinor;
+                return (
+                  <tr key={id}>
+                    <Td className="whitespace-nowrap">{r.date}</Td>
+                    <Td>{r.campaignName}{r.manualOverride ? <div className="text-xs text-muted-foreground">Edited by {r.manualOverride.byName}{meta != null ? ` · Meta: ${pkr(meta)}` : ""}</div> : null}</Td>
+                    <Td>{r.storeId ? storeName.get(r.storeId) : "—"}</Td>
+                    <Td align="right">{pkr(r.spendMinor)}</Td>
+                    <Td>
+                      <ActionForm action={editSpend} className="flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="id" value={id} />
+                        <Input name="amount" inputMode="decimal" defaultValue={(r.spendMinor / 100).toFixed(2)} aria-label={`New spend for ${r.campaignName} on ${r.date}`} className="h-8 w-28 text-[13px]" required />
+                        <Input name="note" placeholder="Reason" aria-label="Reason for the change" className="h-8 w-36 text-[13px]" required />
+                        <Submit size="xs" variant="outline">Save</Submit>
+                      </ActionForm>
+                    </Td>
+                    <Td>
+                      <ActionForm action={deleteSpend} confirm={`Delete ${r.campaignName} spend on ${r.date}? The ledger posting will be reversed.`} className="flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="id" value={id} />
+                        <Input name="note" placeholder="Reason" aria-label="Reason for deleting" className="h-8 w-32 text-[13px]" required />
+                        <Submit size="xs" variant="ghost" className="text-negative">Delete</Submit>
+                      </ActionForm>
+                    </Td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+          {dailyRows.length === 0 ? <Empty title="No ad spend rows in this range" /> : null}
+          {dailyRows.length === 300 ? <CardBody><Notice>Showing the latest 300 rows. Narrow the date range or pick an ad account to see the rest.</Notice></CardBody> : null}
+        </Card>
+      ) : null}
     </>
   );
 }

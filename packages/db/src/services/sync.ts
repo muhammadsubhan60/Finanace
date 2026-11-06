@@ -230,8 +230,11 @@ export async function upsertAdRows(orgId: string, adAccountId: string, rows: AdI
     const m = map[r.campaignId];
     const allocation = m ? (m.division === "local-ecom" ? "division" : "other_division") : (acct?.storeIds?.length === 1 && acct?.dedicated ? "division" : "unallocated");
     const storeId = m?.storeId ?? (acct?.storeIds?.length === 1 ? acct.storeIds[0] : null);
+    const key = { orgId, adAccountId, date: r.date, campaignId: r.campaignId };
+    // A row the owner edited or deleted by hand keeps its manual value; Meta restatements don't overwrite it.
+    if (await db.collection("ad_spend_daily").countDocuments({ ...key, manualOverride: { $exists: true } }, { limit: 1 })) continue;
     const res = await db.collection("ad_spend_daily").findOneAndUpdate(
-      { orgId, adAccountId, date: r.date, campaignId: r.campaignId },
+      key,
       { $setOnInsert: { _id: newId() as never, createdAt: new Date() }, $set: { campaignName: r.campaignName, spendMinor: r.spendMinor, impressions: r.impressions, clicks: r.clicks, purchases: r.purchases, revenueMinor: r.revenueMinor, currency: r.currency, allocation, storeId, updatedAt: new Date() } },
       { upsert: true, returnDocument: "after" },
     );
@@ -284,6 +287,34 @@ async function syncMeta(i: IntegrationDoc, range?: { from: string; to: string })
   const acct = await db.collection("ad_accounts").findOne({ _id: i.refId as never });
   const rows = (await a.fetchDailyInsights(acct?.externalId ?? i.refId, r.from, r.to)).filter((x) => x.currency === "PKR" || (() => { throw new Error(`Unexpected currency ${x.currency}; v1 is PKR only`); })());
   return { rows: rows.length, posted: await upsertAdRows(i.orgId, i.refId, rows) };
+}
+
+/**
+ * Owner correction of one day's ad spend. The ledger stays append-only: postAdRow reverses the previous posting
+ * and posts the new amount (into the current period if the row's period is closed). Delete = amount 0, hidden from lists.
+ */
+export async function overrideAdSpend(ctx: Ctx, rowId: string, input: { amountMinor?: number; remove?: boolean; note: string }) {
+  requirePerm(ctx, "journal:adjust");
+  const note = input.note.trim();
+  if (!note) throw new BusinessError("Give a reason for the change");
+  const remove = !!input.remove;
+  const amount = remove ? 0 : input.amountMinor;
+  if (amount == null || !Number.isSafeInteger(amount) || amount < 0) throw new BusinessError("Amount must be zero or more");
+  const db = await getDb();
+  const col = db.collection("ad_spend_daily");
+  const row = await col.findOne({ _id: rowId as never, orgId: ctx.orgId });
+  if (!row) throw new BusinessError("Ad spend row not found");
+  if (row.deletedAt) throw new BusinessError("This row was already deleted");
+  const meta = row.manualOverride?.meta ?? { spendMinor: row.spendMinor, revenueMinor: row.revenueMinor, purchases: row.purchases };
+  const set: Record<string, unknown> = {
+    spendMinor: amount,
+    manualOverride: { meta, byUserId: ctx.userId, byName: ctx.userName, at: new Date(), note },
+    updatedAt: new Date(),
+    ...(remove ? { deletedAt: new Date(), revenueMinor: 0, purchases: 0 } : {}),
+  };
+  const after = await col.findOneAndUpdate({ _id: rowId as never, orgId: ctx.orgId }, { $set: set }, { returnDocument: "after" });
+  await postAdRow(ctx.orgId, after as never);
+  await audit(ctx, remove ? "ads.delete_spend" : "ads.edit_spend", "ad_spend", rowId, { spendMinor: row.spendMinor, date: row.date, campaignId: row.campaignId }, { spendMinor: amount, note });
 }
 
 export async function payCardBill(ctx: Ctx, amountMinor: number, date: string, ref: string) {
